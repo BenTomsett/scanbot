@@ -12,7 +12,7 @@ import (
 	"sync"
 )
 
-var currentVersion = "v0.0.0"
+var currentVersion = "v0.0.1"
 
 func selfUpdate() {
 	p := &provider.Github{
