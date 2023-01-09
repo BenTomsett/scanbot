@@ -9,9 +9,10 @@ import (
 	"runtime"
 	"scanbot/cmd"
 	"scanbot/database"
+	"sync"
 )
 
-var currentVersion = "0.0.1"
+var currentVersion = "v0.0.0"
 
 func selfUpdate() {
 	p := &provider.Github{
@@ -29,27 +30,35 @@ func selfUpdate() {
 		Version:        currentVersion,
 	}
 
-	if updateAvailable, err := u.CanUpdate(); err != nil {
-		color.Red("Unable to check for updates. Be aware there may be bugs in this version, check https://github.com/BenTomsett/scanbot for updates.")
-	} else if updateAvailable {
-		status, err := u.Update()
+	var wg sync.WaitGroup
+	wg.Add(1)
 
-		if err != nil {
-			color.Red("Scanbot was unable to automatically update. Be aware there may be bugs in this version, check https://github.com/BenTomsett/scanbot for updates.")
-		}
+	var updateStatus updater.UpdateStatus
+	var updateErr error
 
-		if status == updater.Updated {
-			color.Green("Scanbot has updated to the latest version and will now exit. Re-run your command.")
-			os.Exit(0)
-		}
+	go func() {
+		updateStatus, updateErr = u.Update()
+		wg.Done()
+	}()
+
+	wg.Wait()
+
+	if updateErr != nil {
+		color.Red("Scanbot was unable to update. Be aware there may be bugs in this version, check https://github.com/BenTomsett/scanbot for updates.")
+	}
+
+	if updateStatus == updater.Updated {
+		color.Green("Scanbot has been updated to the latest version and will now close. Re-run your command to continue.")
+		os.Exit(1)
 	}
 }
 
 func main() {
+	c := color.New(color.BgGreen)
+	c.Printf(" SCANBOT %s \n\n", currentVersion)
+
 	selfUpdate()
 
-	c := color.New(color.BgGreen)
-	c.Printf(" SCANBOT v%s \n\n", currentVersion)
 	database.Connect()
 	cmd.Execute()
 }
