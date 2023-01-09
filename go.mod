@@ -10,6 +10,8 @@ require (
 
 require (
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
+	github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0 // indirect
+	github.com/mouuff/go-rocket-update v1.5.3 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 )
 
