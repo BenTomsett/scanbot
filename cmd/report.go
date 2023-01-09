@@ -46,7 +46,6 @@ func createReport(scanId string, completed string) {
 
 	for _, hit := range hits {
 		writeRowErr := writer.Write([]string{hit.File, hit.Type, hit.Size, hit.Date})
-		println(hit.File, hit.Type, hit.Size, hit.Date)
 		if writeRowErr != nil {
 			color.Red("An error occurred while writing to the report file.")
 			panic(writeHeaderErr)
